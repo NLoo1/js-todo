@@ -1,0 +1,41 @@
+*{
+    margin: 0 auto;
+}
+
+header{
+    background-color:lightblue;
+    text-align: center;
+}
+
+header h1{
+    color: whitesmoke;
+    padding: 10px;
+    font-size: 2rem;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#submit{
+    background-color: green;
+}
+
+#submit label{
+    padding: 10px;
+    color: white;
+
+}
+
+#submit input[type="text"], input[type="submit"]{
+    border-radius: 8px;
+}
+
+#submit input[type="text"]:hover{
+    background-color: yellow;
+}
+
+#submit input[type="submit"]:hover{
+    background-color: blue;
+}
+
+#content{
+    background-color: red;
+}
