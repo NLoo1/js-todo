@@ -1,97 +1,66 @@
 const textInput = document.querySelector("#toDo");
 const btnSubmit = document.querySelector("#btnSubmit");
 const submitForm = document.querySelector("form");
-const divContent = document.querySelector("#content");
 const list = document.querySelector("ul");
 
 let toDos = JSON.parse(localStorage.getItem("todos")) || [];
 
-for(let todo of toDos){
-    const newToDo = document.createElement("li");
-    newToDo.innerText = todo.task;
-    newToDo.isCompleted = todo.isCompleted;
-    if (newToDo.isCompleted) newToDo.style.textDecoration = "line-through";
+// Function to render a single todo item
+function renderToDoItem(todo) {
+  const newToDo = document.createElement("li");
+  newToDo.innerText = todo.task;
+  newToDo.isCompleted = todo.isCompleted;
+  if (newToDo.isCompleted) {
+    newToDo.style.textDecoration = "line-through";
+  }
 
-    const newBtnRemove = document.createElement("button");
-    const newBtnCross = document.createElement("button");
+  const newBtnRemove = createButton("Remove To-Do", "remove");
+  const newBtnCross = createButton("Cross To-Do", "cross");
 
-    newBtnRemove.innerText = "Remove To-Do"
-    newBtnCross.innerText = "Cross To-Do"
+  newToDo.appendChild(newBtnRemove);
+  newToDo.appendChild(newBtnCross);
 
-    newBtnRemove.id = "remove";
-    newBtnCross.id = "cross";
-
-    newToDo.appendChild(newBtnRemove)
-    newToDo.appendChild(newBtnCross)
-
-    newToDo.isCompleted = false;
-
-    list.appendChild(newToDo);
+  list.appendChild(newToDo);
 }
 
+// Function to create a button
+function createButton(text, id) {
+  const button = document.createElement("button");
+  button.innerText = text;
+  button.id = id;
+  return button;
+}
 
-// console.log(textInput);
+// Render existing todos
+toDos.forEach(renderToDoItem);
 
-// btnSubmit.addEventListener('submit')
+// Event listener for form submission
+submitForm.addEventListener("submit", function (e) {
+  e.preventDefault();
+  addToDo();
+});
 
-submitForm.addEventListener('submit', function(e){
-    e.preventDefault();
-    // console.log(e.target);
-    addToDo();
-})
-
-function addToDo(){
-    const newToDo = document.createElement("li");
-    newToDo.innerText = textInput.value;
-    // console.log(newToDo.innerText);
-
-    toDos.push({task: newToDo.innerText, isCompleted: false});
+function addToDo() {
+  const task = textInput.value.trim();
+  if (task) {
+    toDos.push({ task, isCompleted: false });
     localStorage.setItem("todos", JSON.stringify(toDos));
-    
-    const newBtnRemove = document.createElement("button");
-    const newBtnCross = document.createElement("button");
-
-    newBtnRemove.innerText = "Remove To-Do"
-    newBtnCross.innerText = "Cross To-Do"
-
-    newBtnRemove.id = "remove";
-    newBtnCross.id = "cross";
-
-    newToDo.appendChild(newBtnRemove)
-    newToDo.appendChild(newBtnCross)
-
-    newToDo.isCompleted = false;
-
-    list.appendChild(newToDo);    
-
-    
+    renderToDoItem({ task, isCompleted: false });
+    textInput.value = "";
+  }
 }
 
-list.addEventListener("click", function(e){
-    if(e.target.id == "remove"){
-        // console.log(toDos);
-        // console.log(toDos[0].task);
+// Event listener for list item clicks
+list.addEventListener("click", function (e) {
+  const listItem = e.target.parentElement;
 
-        for(let i = 0; i <toDos.length; i++){
-            // console.log(toDos[i].task);
-            // console.log(e.target.parentElement.innerText);
-            let listTask = e.target.parentElement.innerText;
-            listTask = listTask.substring(0, listTask.indexOf("Remove"));
-            if(toDos[i].task == listTask){
-                let updatedToDos = toDos.filter(todo => todo.task !== listTask);
-                localStorage.setItem("todos", JSON.stringify(updatedToDos));
-                break;
-            }
-        }
-
-
-        e.target.parentElement.remove();
-    }
-    else if(e.target.id == "cross"){
-        if(e.target.parentElement.style.textDecoration == "line-through"){
-            e.target.parentElement.style.textDecoration = "none";
-            e.target.parentElement.isCompleted = "false";
-        }
-        else e.target.parentElement.style.textDecoration = "line-through";
-    }
-})
+  if (e.target.id === "remove") {
+    const taskText = listItem.innerText.split("Remove")[0].trim();
+    toDos = toDos.filter((todo) => todo.task !== taskText);
+    localStorage.setItem("todos", JSON.stringify(toDos));
+    listItem.remove();
+  } else if (e.target.id === "cross") {
+    listItem.isCompleted = !listItem.isCompleted;
+    listItem.style.textDecoration = listItem.isCompleted ? "line-through" : "none";
+  }
+});
